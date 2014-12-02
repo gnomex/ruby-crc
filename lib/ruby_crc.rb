@@ -1,3 +1,7 @@
+require_relative 'crc'
+require_relative 'sender'
+require_relative 'receiver'
+
 module RubyCrc
   BIT_FLAG = 0x3E # 0b111110
 
