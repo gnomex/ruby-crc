@@ -16,5 +16,5 @@ module RubyCrc
   PAYLOAD_OUT = 'saida' # Arquivo de saida após o processamento
   FRAMES_OUT = 'transmissao' # Arquivo com os frames a serem transmitidos
 
-  VERSION = '0.1.0'
+  VERSION = '0.2.0'
 end
