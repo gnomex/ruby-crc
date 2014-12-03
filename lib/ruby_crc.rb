@@ -7,9 +7,13 @@ module RubyCrc
   BIT_FLAG = 0b00111110
   BIT_FLAG_STR = '111110'
 
+  CRC_CODE = 0b10011 # crc x⁴ + x + 1
+  CRC_CODE_STR = '10011' # crc x⁴ + x + 1 :string
+  CRC_ESCAPE = '0'
+
   PAYLOAD_IN = 'entrada' # Arquivo de entrada de dados
   PAYLOAD_OUT = 'saida' # Arquivo de saida após o processamento
   FRAMES_OUT = 'transmissao' # Arquivo com os frames a serem transmitidos
 
-  VERSION = '0.0.1'
+  VERSION = '0.1.0'
 end
