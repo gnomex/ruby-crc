@@ -19,11 +19,9 @@ desc "Receiver"
 task :unpack do
   tr = RubyCrc::Receiver.new
   puts "Instance: #{tr.inspect}"
-
+  tr.load_frames
+  tr.parse
+  tr.umount_frames
+  tr.transmit
   puts "Done."
-end
-
-desc "Task description"
-task :parse do
-  RubyCrc::Receiver.parse('011111101101011111001001111110011111100010101010101011010001111110011111101010101010101101011101001111110')
 end

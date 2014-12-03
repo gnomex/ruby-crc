@@ -12,71 +12,72 @@ module RubyCrc
   # => [OK|ERRO] payload [polinônimo gerador CRC]
   class Receiver
     def initialize
+      @crc = CRC.new
       @buffered_frames = ""
-      @stack = []
-      load_frames
+      @stack = Array.new
+      @frames = Array.new
+      # load_frames
     end
 
-
-    private
     def load_frames
       File.open(RubyCrc::FRAMES_OUT, "r") do |f|
         f.each_line do |line|
-          # @buffered_frames << line.chop unless line.empty?
-          @buffered_frames << line unless line.empty?
+          @buffered_frames << line.chomp unless line.empty?
+          # @buffered_frames << line unless line.empty?
         end
       end
     end
 
-    def self.parse(frames)
-      # buffer = @buffered_frames.gsub(BIT_FLAG_REGEX, 'a') # reserved buffer, replace flags to a
-      @stack = Array.new
+    def umount_frames
+      @stack.each do |item|
+        if item[:status] == 'ok'
+          checksum = @crc.undo( item[:data] )
+          item[:checksum] = checksum
 
-      buffer = frames.gsub(BIT_FLAG_REGEX, 'a') # reserved buffer, replace flags to a
+          unless checksum.match(/^0{4}/)
+            item[:status] = 'erro'
+          end
+        end
+
+        @frames.push( item )
+      end
+    end
+
+    def transmit
+      if @frames.any? # check is exists something on buffer
+        f = File.open(RubyCrc::PAYLOAD_OUT, "w")
+
+        @frames.each do |frame|
+          f.puts frame.to_a.flatten.join(' - ')
+        end
+
+        f.close
+      end
+    end
+
+    def parse
+      puts "buffer:[ #{@buffered_frames}"
+
+      buffer = @buffered_frames.gsub(BIT_FLAG_REGEX, 'a') # reserved buffer, replace flags to a
+
+      puts "buffer:[ #{ buffer }"
 
       while buffer.length > 0
-
         index = buffer.index('a')
-        puts "index. #{index}"
         buffer = buffer.gsub(/^a/, '') #remove first
 
         if index == 0
-
           aux = buffer.index('a')
 
           @stack.push( { data: buffer[0..(aux - 1)], status: 'ok' } )
           buffer = buffer[aux..-1]
         else
           @stack.push( { data: buffer[0..(index - 1)], status: 'erro' } )
-          buffer = buffer[(index..-1)]
+          buffer = buffer[index..-1]
         end
 
         buffer = buffer.gsub(/^a/, '') #remove last
       end
-      puts @stack.inspect
     end
-
-    # find a
-    # if index a != 0 -> chunck -> push to chunks, status: undefined
-    #   remove and find next, if next == current + 1 -> shit!, update latest chuck to frame_error, ignore a
-    # else
-    #   push to stack
-    #   remove a
-    # end
-
-
-      # a.gsub(BIT_FLAG_REGEX, 'a')
-
-      # find 'a' from front of string
-      # remove them
-      # find next a
-      # copy content and push to stack
-      # remove a
-
-      # index('a')
-      # gsub(/^.a/)
-
-      # @stack.push
-      # @stack.pop
   end
 end
