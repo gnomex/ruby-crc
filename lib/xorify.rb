@@ -1,27 +1,41 @@
 module RubyCrc
+  # Make the xor
+  # All logic to brushing the chunk of bits represented on a string
   class Xorify
 
+    # Defines the inc
+    # => inc is the length of polynomial crc to apply xor, defined in RubyCrc module
     def initialize
       @inc = CRC_CODE_STR.length
     end
 
+    # Create a checksum from a chunk of bits
+    # => in: '1101011111'
+    # => algorithm: '11010111110000'
+    # => result: '10'
     def checksum(origin, crc = CRC_CODE_STR)
       checksum = "#{origin}#{crc_polynomial_degree}"
 
-      puts "Start: #{checksum}"
+      puts "Start: #{checksum}" # Low debug mode
 
-      while checksum.length > 5
+      # The logic:
+      # => iterate over the chunck, using inc elements each time
+      # => apply the xor at these elements
+      # => replace the inc first elements of checksum (used to xor)
+      # => prune zeros front of checksum
+      # => @return: the checksum of chunk
+      while checksum.length > @inc
         xor = apply(checksum)
 
-        puts " --xor: #{xor}"
+        # puts " --xor: #{xor}" # Low debug mode
 
         checksum = replace_front_of(checksum, xor)
 
-        puts " -- replace front: #{checksum}"
+        # puts " -- replace front: #{checksum}" # Low debug mode
 
         checksum = prune_zeros(checksum)
 
-        puts " --pruned: #{checksum}"
+        # puts " --pruned: #{checksum}" # Low debug mode
       end
 
       checksum
@@ -31,6 +45,7 @@ module RubyCrc
       [payload, checksum].join('')
     end
 
+    # Append the number of zeros for create a checksum
     def crc_polynomial_degree
       "0000"
     end
@@ -41,13 +56,13 @@ module RubyCrc
     def apply(origin, crc = CRC_CODE_STR)
       xorted = ""
 
-      puts "#{origin[0..4]} ^ #{crc}"
+      # puts "#{origin[0..4]} ^ #{crc}" # Low debug mode
 
       @inc.times do |i|
         xorted << (origin[i].to_i(10) ^ crc[i].to_i(10)).to_s
-        puts "xor[#{xorted}]"
       end
 
+      # puts "xor[#{xorted}]" # Low debug mode
       xorted
     end
 
