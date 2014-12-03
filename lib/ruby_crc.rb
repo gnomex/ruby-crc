@@ -4,8 +4,9 @@ require_relative 'sender'
 require_relative 'receiver'
 
 module RubyCrc
-  BIT_FLAG = 0b00111110
-  BIT_FLAG_STR = '111110'
+  BIT_FLAG = 0b01111110
+  BIT_FLAG_STR = '01111110'
+  BIT_FLAG_REGEX = /01{6}0/
 
   CRC_CODE = 0b10011 # crc x⁴ + x + 1
   CRC_CODE_STR = '10011' # crc x⁴ + x + 1 :string
