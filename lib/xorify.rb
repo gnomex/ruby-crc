@@ -9,15 +9,21 @@ module RubyCrc
       @inc = CRC_CODE_STR.length
     end
 
+    def pack(payload)
+      checksum "#{payload}#{crc_polynomial_degree}"
+    end
+
+    def unpack(frame)
+      checksum "#{frame}" #Force string
+    end
+
+    private
     # Create a checksum from a chunk of bits
     # => in: '1101011111'
     # => algorithm: '11010111110000'
     # => result: '10'
     def checksum(origin, crc = CRC_CODE_STR)
-      checksum = "#{origin}#{crc_polynomial_degree}"
-
-      puts "Start: #{checksum}" # Low debug mode
-
+      checksum = origin
       # The logic:
       # => iterate over the chunck, using inc elements each time
       # => apply the xor at these elements
@@ -26,16 +32,23 @@ module RubyCrc
       # => @return: the checksum of chunk
       while checksum.length > @inc
         xor = apply(checksum)
-
         # puts " --xor: #{xor}" # Low debug mode
 
         checksum = replace_front_of(checksum, xor)
-
         # puts " -- replace front: #{checksum}" # Low debug mode
 
         checksum = prune_zeros(checksum)
-
         # puts " --pruned: #{checksum}" # Low debug mode
+      end
+
+      # checksum
+      complement(checksum)
+    end
+
+    # Complement checksum with zeros
+    def complement(checksum)
+      while checksum.length < crc_polynomial_degree.length
+        checksum = ['0', checksum].join('')
       end
 
       checksum
